@@ -205,6 +205,7 @@ public class Inventory
 
 public class GameStart
 {
+    public int[] playerPos = { 60, 28 };
     Character character;
     Store store;
     public GameStart(Character c, Store s)
@@ -221,49 +222,88 @@ public class GameStart
 
     public void StartScene()
     {
-        int c;
         Console.Clear();
-        Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
-        Console.WriteLine("이곳에서 던전으로 들어가기 전 활동을 할 수 있습니다.\n");
 
-        Console.WriteLine("1. 상태 보기\n2. 인벤토리\n3. 상점\n4. 던전 입장\n5. 휴식하기\n");
-        
-        while(true)
-        {
-            Console.WriteLine("원하시는 행동을 입력해주세요.");
-            try
-            {
-                c = int.Parse(Console.ReadLine());
-            }
-            catch (Exception e) { c = -1; }
-            if(c < 6 && c > 0)
-            {
-                break;
-            }
-            else
-            {
-                Console.WriteLine("잘못된 입력입니다.\n");
-            }
-        }
-        
-        switch (c)
-        {
-            case 1:
-                ShowInfo();
-                break;
-            case 2:
-                ShowInventory();
-                break;
-            case 3:
-                ShowStore();
-                break;
-            case 4:
-                ShowDungeon();
-                break;
-            case 5:
-                RestScene();
-                break;
+        DrawFrame();
+        DrawPlayer(playerPos, 2);
 
+        while (true)
+        {
+            // 키 입력이 있는 경우에만 방향을 변경합니다.
+            if (Console.KeyAvailable)
+            {
+                var key = Console.ReadKey().Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        playerPos[1] -= 1;
+                        DrawPlayer(playerPos, 0);
+                        break;
+                    case ConsoleKey.DownArrow:
+                        playerPos[1] += 1;
+                        DrawPlayer(playerPos, 1);
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        playerPos[0] -= 1;
+                        DrawPlayer(playerPos, 2);
+                        break;
+                    case ConsoleKey.RightArrow:
+                        playerPos[0] += 1;
+                        DrawPlayer(playerPos, 3);
+                        break;
+                }
+            }
+
+            if (playerPos[1] < 1) playerPos[1] = 1;
+            if (playerPos[1] > 28) playerPos[1] = 28;
+            if (playerPos[0] < 2) playerPos[0] = 2;
+            if (playerPos[0] > 118) playerPos[0] = 118;
+
+            if (playerPos[0] >= 25 && playerPos[0] <= 35)
+            {
+                if (playerPos[1] >= 4 && playerPos[1] <= 9)
+                {
+                    playerPos[0] = 30;
+                    playerPos[1] = 10;
+                    RestScene();
+                    break;
+                }
+                else if (playerPos[1] >= 20 && playerPos[1] <= 25)
+                {
+                    playerPos[0] = 30;
+                    playerPos[1] = 26;
+                    ShowInventory();
+                    break;
+                }
+            }
+            else if (playerPos[0] >= 85 && playerPos[0] <= 95)
+            {
+                if (playerPos[1] >= 4 && playerPos[1] <= 9)
+                {
+                    playerPos[0] = 90;
+                    playerPos[1] = 10;
+                    ShowStore();
+                    break;
+                }
+                else if (playerPos[1] >= 20 && playerPos[1] <= 25)
+                {
+                    playerPos[0] = 90;
+                    playerPos[1] = 26;
+                    ShowDungeon();
+                    break;
+                }
+            }
+            else if (playerPos[0] >= 55 && playerPos[0] <= 65)
+            {
+                if (playerPos[1] >= 12 && playerPos[1] <= 17)
+                {
+                    playerPos[0] = 60;
+                    playerPos[1] = 18;
+                    ShowInfo();
+                    break;
+                }
+            }
         }
     }
 
@@ -882,7 +922,105 @@ public class GameStart
                 Console.WriteLine("잘못된 입력입니다.\n");
             }
         }
-        
+    }
+
+    public void DrawFrame()
+    {
+        for (int i = 0; i < 120; i++)
+        {
+            Console.SetCursorPosition(i, 0);
+            Console.Write("#");
+            Console.SetCursorPosition(i, 29);
+            Console.Write("#");
+        }
+
+        for (int i = 0; i < 30; i++)
+        {
+            Console.SetCursorPosition(0, i);
+            Console.Write("#");
+            Console.SetCursorPosition(119, i);
+            Console.Write("#");
+        }
+
+        DrawSquare(25, 4);
+        DrawSquare(85, 4);
+        DrawSquare(25, 20);
+        DrawSquare(85, 20);
+        DrawSquare(55, 12);
+
+        Console.SetCursorPosition(54, 0);
+        Console.WriteLine(" 스파르타 마을 ");
+
+        Console.SetCursorPosition(26, 7);
+        Console.WriteLine("휴식하기");
+        Console.SetCursorPosition(26, 23);
+        Console.WriteLine("인벤토리");
+        Console.SetCursorPosition(88, 7);
+        Console.WriteLine("상점");
+        Console.SetCursorPosition(86, 23);
+        Console.WriteLine("던전 입장");
+        Console.SetCursorPosition(57, 14);
+        Console.WriteLine("캐릭터");
+        Console.SetCursorPosition(58, 15);
+        Console.WriteLine("정보");
+    }
+
+    public void DrawSquare(int x, int y)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            Console.SetCursorPosition(i + x, y);
+            Console.Write("#");
+            Console.SetCursorPosition(i + x, 5 + y);
+            Console.Write("#");
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            Console.SetCursorPosition(x, i + y);
+            Console.Write("#");
+            Console.SetCursorPosition(10 + x, i + y);
+            Console.Write("#");
+        }
+        Console.SetCursorPosition(10 + x, 5 + y);
+        Console.Write("#");
+    }
+
+    public void DrawPlayer(int[] playerPos, int d)
+    {
+        if (playerPos[1] < 1) playerPos[1] = 1;
+        if (playerPos[1] > 28) playerPos[1] = 28;
+        if (playerPos[0] < 2) playerPos[0] = 2;
+        if (playerPos[0] > 118) playerPos[0] = 118;
+
+        if (d == 0)
+        {
+            Console.SetCursorPosition(playerPos[0], playerPos[1] + 1);
+            Console.Write(" ");
+            Console.SetCursorPosition(playerPos[0], playerPos[1]);
+            Console.Write("*");
+        }
+        else if (d == 1)
+        {
+            Console.SetCursorPosition(playerPos[0], playerPos[1] - 1);
+            Console.Write(" ");
+            Console.SetCursorPosition(playerPos[0], playerPos[1]);
+            Console.Write("*");
+        }
+        else if (d == 2)
+        {
+            Console.SetCursorPosition(playerPos[0] + 1, playerPos[1]);
+            Console.Write(" ");
+            Console.SetCursorPosition(playerPos[0], playerPos[1]);
+            Console.Write("*");
+        }
+        else if (d == 3)
+        {
+            Console.SetCursorPosition(playerPos[0] - 1, playerPos[1]);
+            Console.Write(" ");
+            Console.SetCursorPosition(playerPos[0], playerPos[1]);
+            Console.Write("*");
+        }
     }
 }
 
